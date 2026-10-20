@@ -23,23 +23,22 @@ class LocationService: Service(){
     override fun onCreate(){
         super.onCreate()
         val channelId = "gastrack_channel"
-        val channel = NotificationChannel(channelId, "GasTrack ATODUR", NotificationManager.IMPORTANCE_LOW)
+        val channel = NotificationChannel(channelId, "GasTrack ATODUR v1.57", NotificationManager.IMPORTANCE_LOW)
         (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
         val prefs = getSharedPreferences("gastrack", Context.MODE_PRIVATE)
-        jornadaId = prefs.getString("jornadaId","test") ?: "test"
-        usuario = prefs.getString("usuario","rocha") ?: "rocha"
+        jornadaId = prefs.getString("jornadaId","ATODUR") ?: "ATODUR"
+        usuario = prefs.getString("usuario","Antonio") ?: "Antonio"
         deviceId = prefs.getString("deviceId","7") ?: "7"
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("ATODUR - Tracking activo")
-            .setContentText("Equipo $deviceId - $usuario - $jornadaId -> megalweb.vercel.app")
+            .setContentTitle("ATODUR v1.57 - LIVE 3s")
+            .setContentText("Equipo $deviceId - $usuario - $jornadaId -> megalweb")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
             .build()
         startForeground(1, notification)
 
         fused = LocationServices.getFusedLocationProviderClient(this)
-        // FIX: 3000ms + min 2000ms = Life360 ATODUR
         val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 3000L).apply {
             setMinUpdateIntervalMillis(2000L)
             setWaitForAccurateLocation(true)
@@ -58,7 +57,7 @@ class LocationService: Service(){
     private fun updateNotif(text: String) {
         val channelId = "gastrack_channel"
         val notif = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("ATODUR - Tracking activo")
+            .setContentTitle("ATODUR v1.57 - Equipo $deviceId")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
             .setOngoing(true)
@@ -92,7 +91,7 @@ class LocationService: Service(){
             }.toString()
             conn.outputStream.write(json.toByteArray())
             val code = conn.responseCode
-            println("MEGALWEB SEND $code $json -> ${conn.inputStream.bufferedReader().readText().take(200)}")
+            println("ATODUR SEND $code $json")
             conn.disconnect()
         }catch(e: Exception){ e.printStackTrace() }
     }
