@@ -1,75 +1,86 @@
-
 package com.megal.gastrack
 
 import android.Manifest
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import java.util.*
+import androidx.core.content.ContextCompat
 
-class MainActivity: AppCompatActivity(){
-    private lateinit var txtStatus: TextView
-    private lateinit var edtUsuario: EditText
-    private lateinit var edtDevice: EditText
-    private lateinit var btnJornada: Button
-
-    private var enJornada = false
-    private var jornadaId = ""
-
-    override fun onCreate(savedInstanceState: Bundle?){
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(40,80,40,40) }
-        val title = TextView(this).apply { text = "GasTrack v1.57-ATODUR\nBase: megalweb 3s LIVE"; textSize = 20f }
-        edtUsuario = EditText(this).apply { hint = "Usuario (ej: Megal Rocha)"; setText("Megal Rocha") }
-        edtDevice = EditText(this).apply { hint = "Equipo ID (7 u 8)"; setText("7"); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
-        txtStatus = TextView(this).apply { text = "Listo para iniciar jornada"; textSize = 16f; setPadding(0,30,0,30) }
-        btnJornada = Button(this).apply { text = "INICIAR JORNADA" }
-        val btnStop = Button(this).apply { text = "DETENER JORNADA" }
 
-        btnJornada.setOnClickListener { iniciarJornada() }
-        btnStop.setOnClickListener { detenerJornada() }
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(40, 80, 40, 40)
+        }
 
-        layout.addView(title); layout.addView(edtUsuario); layout.addView(edtDevice); layout.addView(txtStatus); layout.addView(btnJornada); layout.addView(btnStop)
+        val title = TextView(this).apply {
+            text = "GasTrack v1.57-ATODUR\nLIVE 3s - megalweb.vercel.app"
+            textSize = 22f
+            setTextColor(0xFF00FF00.toInt())
+        }
+
+        val inputEquipo = EditText(this).apply {
+            hint = "Equipo (7)"
+            setText("7")
+        }
+        val inputUsuario = EditText(this).apply {
+            hint = "Usuario"
+            setText("Antonio")
+        }
+        val inputJornada = EditText(this).apply {
+            hint = "Jornada ID"
+            setText("ATODUR-${System.currentTimeMillis()}")
+        }
+
+        val btnIniciar = Button(this).apply {
+            text = "● INICIAR JORNADA ATODUR 3s"
+            setBackgroundColor(0xFFFF0000.toInt())
+            setTextColor(0xFFFFFFFF.toInt())
+        }
+
+        val btnDetener = Button(this).apply {
+            text = "■ DETENER"
+        }
+
+        val status = TextView(this).apply {
+            text = "Estado: Esperando..."
+            textSize = 16f
+        }
+
+        btnIniciar.setOnClickListener {
+            val prefs = getSharedPreferences("gastrack", MODE_PRIVATE)
+            prefs.edit().apply {
+                putString("deviceId", inputEquipo.text.toString())
+                putString("usuario", inputUsuario.text.toString())
+                putString("jornadaId", inputJornada.text.toString())
+                apply()
+            }
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION), 1)
+            } else {
+                val intent = Intent(this, LocationService::class.java)
+                ContextCompat.startForegroundService(this, intent)
+                status.text = "Estado: ATODUR ACTIVO 3s - Equipo ${inputEquipo.text} - Enviando a megalweb.vercel.app/api/ingest"
+            }
+        }
+
+        btnDetener.setOnClickListener {
+            stopService(Intent(this, LocationService::class.java))
+            status.text = "Estado: DETENIDO"
+        }
+
+        layout.addView(title)
+        layout.addView(inputEquipo)
+        layout.addView(inputUsuario)
+        layout.addView(inputJornada)
+        layout.addView(btnIniciar)
+        layout.addView(btnDetener)
+        layout.addView(status)
         setContentView(layout)
-
-        checkPerms()
-        // recuperar prefs
-        val prefs = getSharedPreferences("gastrack", Context.MODE_PRIVATE)
-        enJornada = prefs.getBoolean("enJornada", false)
-        jornadaId = prefs.getString("jornadaId","") ?: ""
-        if(enJornada){ txtStatus.text = "En jornada: $jornadaId"; btnJornada.text = "EN JORNADA" }
-    }
-
-    private fun checkPerms(){
-        val perms = mutableListOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-        if(Build.VERSION.SDK_INT >= 33) perms.add(Manifest.permission.POST_NOTIFICATIONS)
-        val missing = perms.filter { ActivityCompat.checkSelfPermission(this,it) != PackageManager.PERMISSION_GRANTED }
-        if(missing.isNotEmpty()) ActivityCompat.requestPermissions(this, missing.toTypedArray(), 1)
-    }
-
-    private fun iniciarJornada(){
-        val usuario = edtUsuario.text.toString().ifBlank { "rocha" }
-        val device = edtDevice.text.toString().ifBlank { "7" }
-        jornadaId = UUID.randomUUID().toString().substring(0,8)
-        val prefs = getSharedPreferences("gastrack", Context.MODE_PRIVATE)
-        prefs.edit().putString("usuario", usuario).putString("deviceId", device).putString("jornadaId", jornadaId).putBoolean("enJornada", true).apply()
-        val intent = Intent(this, LocationService::class.java)
-        if(Build.VERSION.SDK_INT >= 26) startForegroundService(intent) else startService(intent)
-        txtStatus.text = "Jornada iniciada: $jornadaId\nEquipo $device - $usuario\nEnviando a Turso megal-erp/gps_locations"
-        btnJornada.text = "EN JORNADA: $jornadaId"
-        Toast.makeText(this, "Jornada $jornadaId iniciada", Toast.LENGTH_LONG).show()
-    }
-
-    private fun detenerJornada(){
-        stopService(Intent(this, LocationService::class.java))
-        getSharedPreferences("gastrack", Context.MODE_PRIVATE).edit().putBoolean("enJornada", false).apply()
-        txtStatus.text = "Jornada detenida"
-        btnJornada.text = "INICIAR JORNADA"
-        Toast.makeText(this, "Jornada detenida", Toast.LENGTH_SHORT).show()
     }
 }
