@@ -5,27 +5,37 @@ plugins {
 
 android {
     namespace = "com.megal.gastrack"
-    compileSdk = 35
+    compileSdk = 34
+
     defaultConfig {
         applicationId = "com.megal.gastrack"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 4
-        versionName = "4.0-ATODUR"
+        targetSdk = 34
+        versionCode = 57
+        versionName = "1.57-ATODUR"
     }
+
     buildTypes {
-        release { isMinifyEnabled = false }
+        release {
+            isMinifyEnabled = false
+        }
+        debug {
+            isMinifyEnabled = false
+        }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
