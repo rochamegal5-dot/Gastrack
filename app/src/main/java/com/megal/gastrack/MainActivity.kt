@@ -24,7 +24,7 @@ class MainActivity: AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(40,80,40,40) }
-        val title = TextView(this).apply { text = "GasTrack v1.0.15-TURSO\nBase: megal-erp"; textSize = 20f }
+        val title = TextView(this).apply { text = "GasTrack v1.57-ATODUR\nBase: megalweb 3s LIVE"; textSize = 20f }
         edtUsuario = EditText(this).apply { hint = "Usuario (ej: Megal Rocha)"; setText("Megal Rocha") }
         edtDevice = EditText(this).apply { hint = "Equipo ID (7 u 8)"; setText("7"); inputType = android.text.InputType.TYPE_CLASS_NUMBER }
         txtStatus = TextView(this).apply { text = "Listo para iniciar jornada"; textSize = 16f; setPadding(0,30,0,30) }
