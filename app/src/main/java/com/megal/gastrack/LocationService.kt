@@ -8,17 +8,10 @@ import android.content.Intent
 import android.os.BatteryManager
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import com.google.android.gms.location.*
+import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
@@ -38,16 +31,14 @@ class LocationService : Service() {
         deviceId = prefs.getString("deviceId", "7") ?: "7"
 
         val channelId = "gastrack_channel"
-        val channel = NotificationChannel(channelId, "ATODUR v1.57", NotificationManager.IMPORTANCE_LOW)
-        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        nm.createNotificationChannel(channel)
+        val channel = NotificationChannel(channelId, "ATODUR v1.57 TURSO", NotificationManager.IMPORTANCE_LOW)
+        (getSystemService(NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("ATODUR v1.57 - LIVE 3s")
-            .setContentText("Equipo $deviceId -> megalweb.vercel.app")
+            .setContentTitle("ATODUR v1.57 - TURSO LIVE 3s")
+            .setContentText("Equipo $deviceId -> /api/ingest")
             .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setOngoing(true)
-            .build()
+            .setOngoing(true).build()
         startForeground(1, notification)
 
         fused = LocationServices.getFusedLocationProviderClient(this)
@@ -63,6 +54,7 @@ class LocationService : Service() {
                 }
             }, Looper.getMainLooper())
         } catch (e: SecurityException) {
+            Log.e("ATODUR", "Sin permiso: ${e.message}")
         }
     }
 
@@ -78,8 +70,9 @@ class LocationService : Service() {
             conn.requestMethod = "POST"
             conn.setRequestProperty("Content-Type", "application/json")
             conn.doOutput = true
-            conn.connectTimeout = 8000
-            conn.readTimeout = 8000
+            conn.connectTimeout = 10000
+            conn.readTimeout = 10000
+
             val json = JSONObject().apply {
                 put("device_id", deviceId.toIntOrNull() ?: 7)
                 put("usuario", usuario)
@@ -89,18 +82,19 @@ class LocationService : Service() {
                 put("accuracy", loc.accuracy)
                 put("velocidad", loc.speed * 3.6f)
                 put("battery", getBattery())
-                put("timestamp", System.currentTimeMillis())
             }.toString()
+
+            Log.d("ATODUR", "Enviando: $json")
             conn.outputStream.use { it.write(json.toByteArray()) }
             val code = conn.responseCode
+            val response = conn.inputStream.bufferedReader().readText()
+            Log.d("ATODUR", "TURSO $code -> $response")
             conn.disconnect()
         } catch (e: Exception) {
+            Log.e("ATODUR", "Error Turso: ${e.message}", e)
         }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
-    }
+    override fun onDestroy() { super.onDestroy(); scope.cancel() }
 }
