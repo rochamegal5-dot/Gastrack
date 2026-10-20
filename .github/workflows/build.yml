@@ -1,4 +1,4 @@
-name: Build Gastrack Life360 APK
+name: Build Gastrack APK
 on: [push]
 jobs:
   build:
@@ -10,19 +10,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          cmdline-tools-version: 12266719
-          packages: ''
-      - name: Accept licenses
-        run: yes | sdkmanager --licenses || true
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Grant execute permission
+        run: chmod +x gradlew
       - name: Build APK
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: ./gradlew :app:assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Gastrack-Life360-ATODUR
+          name: Gastrack-ATODUR
           path: app/build/outputs/apk/debug/app-debug.apk
