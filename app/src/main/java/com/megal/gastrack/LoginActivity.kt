@@ -2,11 +2,17 @@ package com.megal.gastrack
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import org.json.JSONArray
+import java.net.URL
+import kotlin.concurrent.thread
 
 class LoginActivity : AppCompatActivity() {
+    data class Repartidor(val nombre: String, val device_id: Int)
+    private var lista = mutableListOf<Repartidor>()
+    private var seleccionado: Repartidor? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -16,19 +22,46 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java)); finish(); return
         }
 
-        fun login(nombre: String, id: String) {
+        val spinner = findViewById<Spinner>(R.id.spinnerLogin)
+        val tvInfo = findViewById<TextView>(R.id.tvLoginInfo)
+        val btn = findViewById<Button>(R.id.btnIniciarSesion)
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(p: AdapterView<*>?, v: android.view.View?, pos: Int, id: Long) {
+                if (pos < lista.size) seleccionado = lista[pos]
+            }
+            override fun onNothingSelected(p: AdapterView<*>?) {}
+        }
+
+        // Carga de Turso desde megalweb
+        thread {
             try {
-                Toast.makeText(this, "Iniciando $nombre", Toast.LENGTH_SHORT).show()
-                prefs.edit().putBoolean("sesion_iniciada", true).putString("usuario", nombre).putString("deviceId", id).apply()
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                val text = URL("https://megalweb.vercel.app/api/repartidores").readText()
+                val arr = JSONArray(text)
+                lista.clear()
+                for (i in 0 until arr.length()) {
+                    val o = arr.getJSONObject(i)
+                    // Soporta device_id o deviceId
+                    val id = if (o.has("device_id")) o.getInt("device_id") else o.getInt("deviceId")
+                    lista.add(Repartidor(o.getString("nombre"), id))
+                }
+            } catch (e: Exception) { e.printStackTrace() }
+            if (lista.isEmpty()) {
+                lista.add(Repartidor("Antonio - Equipo 7", 7))
+                lista.add(Repartidor("Jose - Equipo 8", 8))
+            }
+            runOnUiThread {
+                tvInfo.text = "Turso: ${lista.size} repartidores"
+                val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, lista.map { "${it.nombre}" })
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner.adapter = adapter
             }
         }
 
-        findViewById<Button>(R.id.btnAntonio).setOnClickListener { login("Antonio - Equipo 7", "7") }
-        findViewById<Button>(R.id.btnJose).setOnClickListener { login("Jose - Equipo 8", "8") }
-        findViewById<Button>(R.id.btnMegal).setOnClickListener { login("Megal", "1") }
+        btn.setOnClickListener {
+            if (seleccionado == null) { Toast.makeText(this, "Seleccioná repartidor", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+            prefs.edit().putBoolean("sesion_iniciada", true).putString("deviceId", seleccionado!!.device_id.toString()).putString("usuario", seleccionado!!.nombre).apply()
+            startActivity(Intent(this, MainActivity::class.java)); finish()
+        }
     }
 }
