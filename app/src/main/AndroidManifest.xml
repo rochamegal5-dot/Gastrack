@@ -1,18 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.megal.gastrack">
+
+    <!-- PERMISOS NECESARIOS PARA UBICACION EXACTA EN SEGUNDO PLANO -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <application android:allowBackup="true" android:label="GasTrack ATODUR"
-        android:icon="@android:drawable/ic_menu_mylocation"
-        android:theme="@android:style/Theme.Black.NoTitleBar">
-        <activity android:name=".MainActivity" android:exported="true">
-            <intent-filter><action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="GasTrack ATODUR"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.GasTrack"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+
+        <!-- LOGIN - ES EL LAUNCHER AHORA -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true"
+            android:label="ATODUR Login"
+            android:theme="@style/Theme.GasTrack">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <service android:name=".LocationService" android:foregroundServiceType="location" />
+
+        <!-- MAIN - PANTALLA DE TRACKING (solo se entra con sesion) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:label="GasTrack ATODUR" />
+
+        <!-- SERVICIO DE UBICACION - SOLO SE CANCELA CON CERRAR SESION -->
+        <service
+            android:name=".LocationService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
     </application>
+
 </manifest>
