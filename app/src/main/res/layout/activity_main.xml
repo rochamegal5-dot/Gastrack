@@ -6,9 +6,46 @@
     android:gravity="center"
     android:padding="24dp"
     android:background="#0F172A">
-    <TextView android:id="@+id/tvBienvenido" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hola" android:textSize="22sp" android:textColor="#FFFFFF" android:textStyle="bold"/>
-    <TextView android:id="@+id/tvEquipo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Equipo" android:textColor="#FACC15" android:layout_marginBottom="32dp"/>
-    <Button android:id="@+id/btnIniciar" android:layout_width="match_parent" android:layout_height="56dp" android:text="INICIAR" android:layout_marginBottom="12dp"/>
-    <Button android:id="@+id/btnDetener" android:layout_width="match_parent" android:layout_height="56dp" android:text="PAUSAR" android:layout_marginBottom="24dp"/>
-    <Button android:id="@+id/btnCerrarSesion" android:layout_width="match_parent" android:layout_height="56dp" android:text="CERRAR SESION"/>
+
+    <TextView
+        android:id="@+id/tvBienvenido"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/tvEquipo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FACC15"
+        android:textSize="18sp"
+        android:layout_marginBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/tvEstado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Listo para iniciar"
+        android:textColor="#94A3B8"
+        android:layout_marginBottom="48dp"/>
+
+    <!-- SOLO 2 BOTONES COMO PEDISTE -->
+    <Button
+        android:id="@+id/btnIniciar"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:text="INICIAR SEGUIMIENTO"
+        android:textSize="16sp"
+        android:backgroundTint="#22C55E"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="CERRAR SESIÓN"
+        android:backgroundTint="#EF4444"/>
+
 </LinearLayout>
