@@ -2,12 +2,11 @@ package com.megal.gastrack
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.*
+import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 class LoginActivity : AppCompatActivity() {
-    data class Repartidor(val nombre: String, val id: Int)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -17,36 +16,19 @@ class LoginActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java)); finish(); return
         }
 
-        val spinner = findViewById<Spinner>(R.id.spinnerLogin)
-        val btn = findViewById<Button>(R.id.btnIniciarSesion)
-
-        val lista = listOf(
-            Repartidor("Antonio - Equipo 7", 7),
-            Repartidor("Jose - Equipo 8", 8),
-            Repartidor("Megal", 1)
-        )
-        var seleccionado = lista[0]
-
-        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, lista.map { it.nombre })
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(p0: AdapterView<*>?, p1: android.view.View?, pos: Int, p3: Long) { seleccionado = lista[pos] }
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-        }
-
-        btn.setOnClickListener {
+        fun login(nombre: String, id: String) {
             try {
-                Toast.makeText(this, "Iniciando como ${seleccionado.nombre}", Toast.LENGTH_SHORT).show()
-                prefs.edit()
-                    .putBoolean("sesion_iniciada", true)
-                    .putString("deviceId", seleccionado.id.toString())
-                    .putString("usuario", seleccionado.nombre)
-                    .apply()
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
+                Toast.makeText(this, "Iniciando $nombre", Toast.LENGTH_SHORT).show()
+                prefs.edit().putBoolean("sesion_iniciada", true).putString("usuario", nombre).putString("deviceId", id).apply()
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             } catch (e: Exception) {
-                Toast.makeText(this, "Error login: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+
+        findViewById<Button>(R.id.btnAntonio).setOnClickListener { login("Antonio - Equipo 7", "7") }
+        findViewById<Button>(R.id.btnJose).setOnClickListener { login("Jose - Equipo 8", "8") }
+        findViewById<Button>(R.id.btnMegal).setOnClickListener { login("Megal", "1") }
     }
 }
