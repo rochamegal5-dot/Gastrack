@@ -18,30 +18,35 @@ class LoginActivity : AppCompatActivity() {
         }
 
         val spinner = findViewById<Spinner>(R.id.spinnerLogin)
-        val tvInfo = findViewById<TextView>(R.id.tvLoginInfo)
-        val progress = findViewById<ProgressBar>(R.id.progressLogin)
         val btn = findViewById<Button>(R.id.btnIniciarSesion)
 
-        progress.visibility = ProgressBar.GONE
-        tvInfo.text = "Seleccioná repartidor"
-
-        // Datos locales, no depende de internet, no crashea nunca
-        val lista = listOf(Repartidor("Antonio - Equipo 7", 7), Repartidor("Jose - Equipo 8", 8), Repartidor("Megal", 1))
+        val lista = listOf(
+            Repartidor("Antonio - Equipo 7", 7),
+            Repartidor("Jose - Equipo 8", 8),
+            Repartidor("Megal", 1)
+        )
         var seleccionado = lista[0]
 
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, lista.map { "${it.nombre}" })
-        spinner.adapter = adapter
+        spinner.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, lista.map { it.nombre })
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: android.view.View?, pos: Int, p3: Long) { seleccionado = lista[pos] }
             override fun onNothingSelected(p0: AdapterView<*>?) {}
         }
 
         btn.setOnClickListener {
-            prefs.edit().putBoolean("sesion_iniciada", true)
-                .putString("deviceId", seleccionado.id.toString())
-                .putString("usuario", seleccionado.nombre)
-                .apply()
-            startActivity(Intent(this, MainActivity::class.java)); finish()
+            try {
+                Toast.makeText(this, "Iniciando como ${seleccionado.nombre}", Toast.LENGTH_SHORT).show()
+                prefs.edit()
+                    .putBoolean("sesion_iniciada", true)
+                    .putString("deviceId", seleccionado.id.toString())
+                    .putString("usuario", seleccionado.nombre)
+                    .apply()
+                val i = Intent(this, MainActivity::class.java)
+                startActivity(i)
+                finish()
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error login: ${e.message}", Toast.LENGTH_LONG).show()
+            }
         }
     }
 }
