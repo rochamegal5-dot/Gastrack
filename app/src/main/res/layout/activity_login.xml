@@ -6,8 +6,16 @@
     android:gravity="center"
     android:padding="24dp"
     android:background="#0F172A">
-    <Spinner android:id="@+id/spinnerLogin" android:layout_width="match_parent" android:layout_height="56dp" android:background="#1E293B"/>
-    <ProgressBar android:id="@+id/progressLogin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp"/>
-    <TextView android:id="@+id/tvLoginInfo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cargando..." android:textColor="#94A3B8" android:layout_marginTop="8dp" android:layout_marginBottom="24dp"/>
-    <Button android:id="@+id/btnIniciarSesion" android:layout_width="match_parent" android:layout_height="56dp" android:text="INICIAR SESION"/>
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MEGAL ERP" android:textSize="28sp" android:textColor="#FACC15" android:textStyle="bold" android:layout_marginBottom="32dp"/>
+
+    <Button android:id="@+id/btnAntonio" android:layout_width="match_parent" android:layout_height="56dp" android:text="Antonio - Equipo 7" android:layout_marginBottom="12dp"/>
+    <Button android:id="@+id/btnJose" android:layout_width="match_parent" android:layout_height="56dp" android:text="Jose - Equipo 8" android:layout_marginBottom="12dp"/>
+    <Button android:id="@+id/btnMegal" android:layout_width="match_parent" android:layout_height="56dp" android:text="Megal" android:layout_marginBottom="24dp"/>
+
+    <TextView android:id="@+id/tvLoginInfo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Seleccioná equipo" android:textColor="#94A3B8"/>
+    <!-- IDs falsos para que no crashee si tu código viejo los busca -->
+    <Spinner android:id="@+id/spinnerLogin" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <ProgressBar android:id="@+id/progressLogin" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <Button android:id="@+id/btnIniciarSesion" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
 </LinearLayout>
