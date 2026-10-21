@@ -10,7 +10,7 @@
     <application
         android:allowBackup="true"
         android:label="GasTrack ATODUR"
-        android:theme="@android:style/Theme.NoTitleBar"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
         <activity android:name=".LoginActivity" android:exported="true">
             <intent-filter>
